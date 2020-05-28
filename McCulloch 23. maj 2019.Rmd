@@ -1,0 +1,815 @@
+---
+title: "McCulloch - 23. maj 2020"
+author: "Gruppe 4.215"
+date: "28/5/2020"
+output: pdf_document
+---
+
+13 stående obligationer (danske statsobligationer)
+
+```{r}
+library(lubridate)
+pris <- c(102.02, 101.356, 101.56, 109.114, 102.92, 102.45 , 107.48, 141.57, 113.888, 105.74,
+          105.3, 113.56, 181.53)
+
+kupon <- c(0.01, 0.0025, 0.005, 0.03, 0.0025, 0.0063, 0.001, 0.07, 0.0175, 0.005, 0.005,
+           0.001, 0.045)
+
+udlob <- c("2020-06-11", "2020-11-15", "2021-06-22", "2021-11-15", "2022-11-15", "2023-06-27", "2023-11-15", "2024-11-10", "2025-11-15", "2027-11-15", "2029-11-15",
+           "2030-11-15", "2039-11-15")
+
+obl <- data.frame(udlob, kupon, pris)
+
+colnames(obl) <- c("Udløbsdato", "Kuponrente", "Pris")
+
+rownames(obl) <- c("Foroya Lan JUN20", "Danske stat 2020", "Foroya Lan JUN21", "3St.l. 21 DG",
+                   "Danske stat 2022", "Foroya Lan JUN23", "DGBI 2023 GB",
+                   "7St.l. 24 GB", "Danske stat 2025", "Danske stat 2027", "Danske stat 2029",
+                   "DGBi", "4.5St.l 39 GB")
+
+obl
+```
+
+Vi antager at betalingsdagen (kupondagen) er på samme dag og måned som udløbsdatoen.\
+Vi bestemmer hver terminsdato i obligationens løbetid
+
+```{r}
+termin1 <- c("2019-06-11", "2020-06-11")
+termin2 <- c("2019-11-15", "2020-11-15")
+termin3 <- c("2019-06-22", "2020-06-22", "2021-06-22")
+termin4 <- c("2019-11-15", "2020-11-15", "2021-11-15")
+termin5 <- c("2019-11-15", "2020-11-15", "2021-11-15", "2022-11-15")
+termin6 <- c("2019-06-27", "2020-06-27", "2021-06-27", "2022-06-27", "2023-06-27")
+termin7 <- c("2019-11-15", "2020-11-15","2021-11-15", "2022-11-15", "2023-11-15")
+termin8 <- c("2019-11-15", "2020-11-10", "2021-11-10", "2022-11-10", "2023-11-10", "2024-11-10")
+termin9 <- c("2019-11-15", "2020-11-15", "2021-11-15", "2022-11-15", "2023-11-15", "2024-11-15","2025-11-15")
+termin10 <- c("2019-11-15", "2020-11-15", "2021-11-15", "2022-11-15", "2023-11-15", "2024-11-15", "2025-11-15",
+              "2026-11-15", "2027-11-15")
+termin11 <- c("2019-11-15", "2020-11-15", "2021-11-15", "2022-11-15", "2023-11-15", "2024-11-15", "2025-11-15",
+              "2026-11-15", "2027-11-15", "2028-11-15", "2029-11-15")
+termin12 <- c("2019-11-15", "2020-11-15", "2021-11-15", "2022-11-15", "2023-11-15", "2024-11-15", "2025-11-15",
+              "2026-11-15", "2027-11-15", "2028-11-15", "2029-11-15", "2030-11-15")
+termin13 <- c("2019-11-15", "2020-11-15", "2021-11-15", "2022-11-15", "2023-11-15", "2024-11-15", "2025-11-15",
+              "2026-11-15", "2027-11-15", "2028-11-15", "2029-11-15", "2030-11-15", "2031-11-15",                  "2032-11-15", "2033-11-15", "2034-11-15", "2035-11-15", "2036-11-15", "2037-11-15",
+              "2038-11-15", "2039-11-15")
+```
+
+Vi bestemmer den tidsmæssige afstand (målt i år) fra d. 3. april 2020 til hver kupondag for obligationerne $(t_1, t_2, \dots, t_N)$, hvor $t_N=T_N$ er den tidsmæssig afstand fra nu til udløbsdatoen (den sidste kupon dag)
+
+```{r}
+idag <- "2019-05-23"
+
+tid1 <- c(1:length(termin1))
+for(i in 1:length(termin1)){
+  tid1[i] <- time_length(difftime(as.Date(termin1[i]),as.Date(idag)), "years")
+}
+
+
+tid2 <- c(1:length(termin2))
+for(i in 1:length(termin2)){
+  tid2[i] <- time_length(difftime(as.Date(termin2[i]),as.Date(idag)), "years")
+}
+
+tid3 <- c(1:length(termin3))
+for(i in 1:length(termin3)){
+  tid3[i] <- time_length(difftime(as.Date(termin3[i]),as.Date(idag)), "years")
+}
+
+
+tid4 <- c(1:length(termin4))
+for(i in 1:length(termin4)){
+  tid4[i] <- time_length(difftime(as.Date(termin4[i]),as.Date(idag)), "years")
+}
+
+tid5 <- c(1:length(termin5))
+for(i in 1:length(termin5)){
+  tid5[i] <- time_length(difftime(as.Date(termin5[i]),as.Date(idag)), "years")
+}
+
+tid6 <- c(1:length(termin6))
+for(i in 1:length(termin6)){
+  tid6[i] <- time_length(difftime(as.Date(termin6[i]),as.Date(idag)), "years")
+}
+
+tid7 <- c(1:length(termin7))
+for(i in 1:length(termin7)){
+  tid7[i] <- time_length(difftime(as.Date(termin7[i]),as.Date(idag)), "years")
+}
+
+tid8 <- c(1:length(termin8))
+for(i in 1:length(termin8)){
+  tid8[i] <- time_length(difftime(as.Date(termin8[i]),as.Date(idag)), "years")
+}
+
+tid9 <- c(1:length(termin9))
+for(i in 1:length(termin9)){
+  tid9[i] <- time_length(difftime(as.Date(termin9[i]),as.Date(idag)), "years")
+}
+
+tid10 <- c(1:length(termin10))
+for(i in 1:length(termin10)){
+  tid10[i] <- time_length(difftime(as.Date(termin10[i]),as.Date(idag)), "years")
+}
+
+tid11 <- c(1:length(termin11))
+for(i in 1:length(termin11)){
+  tid11[i] <- time_length(difftime(as.Date(termin11[i]),as.Date(idag)), "years")
+}
+
+tid12 <- c(1:length(termin12))
+for(i in 1:length(termin12)){
+  tid12[i] <- time_length(difftime(as.Date(termin12[i]),as.Date(idag)), "years")
+}
+
+tid13 <- c(1:length(termin13))
+for(i in 1:length(termin13)){
+  tid13[i] <- time_length(difftime(as.Date(termin13[i]),as.Date(idag)), "years")
+}
+```
+
+Vi bestemmer nu ydelsesrækken for hver obligation. Vi antager at hovedstolen er 100 for alle obligationer. Siden at alle obligationer er stående, har vi følgende udregninger.
+
+```{r}
+ydelse1 <- c(1:length(tid1))
+for(i in 1:(length(ydelse1)-1)){
+  ydelse1[i] <- 100*obl[1,2]
+  ydelse1[length(ydelse1)] <- 100*(1+obl[1,2])
+}
+
+
+ydelse2 <- c(1:length(tid2))
+for(i in 1:(length(ydelse2)-1)){
+  ydelse2[i] <- 100*obl[2,2]
+  ydelse2[length(ydelse2)] <- 100*(1+obl[2,2])
+}
+
+
+ydelse3 <- c(1:length(tid3))
+for(i in 1:(length(ydelse3)-1)){
+  ydelse3[i] <- 100*obl[3,2]
+  ydelse3[length(ydelse3)] <- 100*(1+obl[3,2])
+}
+
+
+ydelse4 <- c(1:length(tid4))
+for(i in 1:(length(ydelse4)-1)){
+  ydelse4[i] <- 100*obl[4,2]
+  ydelse4[length(ydelse4)] <- 100*(1+obl[4,2])
+}
+
+
+ydelse5 <- c(1:length(tid5))
+for(i in 1:(length(ydelse5)-1)){
+  ydelse5[i] <- 100*obl[5,2]
+  ydelse5[length(ydelse5)] <- 100*(1+obl[5,2])
+}
+
+
+ydelse6 <- c(1:length(tid6))
+for(i in 1:(length(ydelse6)-1)){
+  ydelse6[i] <- 100*obl[6,2]
+  ydelse6[length(ydelse6)] <- 100*(1+obl[6,2])
+}
+
+
+ydelse7 <- c(1:length(tid7))
+for(i in 1:(length(ydelse7)-1)){
+  ydelse7[i] <- 100*obl[7,2]
+  ydelse7[length(ydelse7)] <- 100*(1+obl[7,2])
+}
+
+
+ydelse8 <- c(1:length(tid8))
+for(i in 1:(length(ydelse8)-1)){
+  ydelse8[i] <- 100*obl[8,2]
+  ydelse8[length(ydelse8)] <- 100*(1+obl[8,2])
+} 
+
+ydelse9 <- c(1:length(tid9))
+for(i in 1:(length(ydelse9)-1)){
+  ydelse9[i] <- 100*obl[9,2]
+  ydelse9[length(ydelse9)] <- 100*(1+obl[9,2])
+}
+
+
+ydelse10 <- c(1:length(tid10))
+for(i in 1:(length(ydelse10)-1)){
+  ydelse10[i] <- 100*obl[10,2]
+  ydelse10[length(ydelse10)] <- 100*(1+obl[10,2])
+}
+
+
+ydelse11 <- c(1:length(tid11))
+for(i in 1:(length(ydelse11)-1)){
+  ydelse11[i] <- 100*obl[11,2]
+  ydelse11[length(ydelse11)] <- 100*(1+obl[11,2])
+}
+
+
+ydelse12 <- c(1:length(tid12))
+for(i in 1:(length(ydelse12)-1)){
+  ydelse12[i] <- 100*obl[12,2]
+  ydelse12[length(ydelse12)] <- 100*(1+obl[12,2])
+}
+
+
+ydelse13 <- c(1:length(tid13))
+for(i in 1:(length(ydelse13)-1)){
+  ydelse13[i] <- 100*obl[13,2]
+  ydelse13[length(ydelse13)] <- 100*(1+obl[13,2])
+}
+
+```
+
+Højre siden (forskellen i pris og samledede ydelser for hver obligation) i ligningssystemet kan bestemmes
+
+```{r}
+z <- c(1:length(obl[,1]))
+z[1] <- obl[1,3] - crossprod(ydelse1, matrix(c(1:1), ncol=1, nrow = length(ydelse1)))
+z[2] <- obl[2,3] - crossprod(ydelse2, matrix(c(1:1), ncol=1, nrow = length(ydelse2)))
+z[3] <- obl[3,3] - crossprod(ydelse3, matrix(c(1:1), ncol=1, nrow = length(ydelse3)))
+z[4] <- obl[4,3] - crossprod(ydelse4, matrix(c(1:1), ncol=1, nrow = length(ydelse4)))
+z[5] <- obl[5,3] - crossprod(ydelse5, matrix(c(1:1), ncol=1, nrow = length(ydelse5)))
+z[6] <- obl[6,3] - crossprod(ydelse6, matrix(c(1:1), ncol=1, nrow = length(ydelse6)))
+z[7] <- obl[7,3] - crossprod(ydelse7, matrix(c(1:1), ncol=1, nrow = length(ydelse7)))
+z[8] <- obl[8,3] - crossprod(ydelse8, matrix(c(1:1), ncol=1, nrow = length(ydelse8)))
+z[9] <- obl[9,3] - crossprod(ydelse9, matrix(c(1:1), ncol=1, nrow = length(ydelse9)))
+z[10] <- obl[10,3] - crossprod(ydelse10, matrix(c(1:1), ncol=1, nrow = length(ydelse10)))
+z[11] <- obl[11,3] - crossprod(ydelse11, matrix(c(1:1), ncol=1, nrow = length(ydelse11)))
+z[12] <- obl[12,3] - crossprod(ydelse12, matrix(c(1:1), ncol=1, nrow = length(ydelse12)))
+z[13] <- obl[13,3] - crossprod(ydelse13, matrix(c(1:1), ncol=1, nrow = length(ydelse13)))
+
+z
+```
+
+Bestemmer vedhængende rente
+
+```{r}
+ved.rente <- c(1:length(obl[,1]))
+
+ved.rente[1] <- 100*obl[1,2]*(1-tid1[1])
+ved.rente[2] <- 100*obl[2,2]*(1-tid2[1])
+ved.rente[3] <- 100*obl[3,2]*(1-tid3[1])
+ved.rente[4] <- 100*obl[4,2]*(1-tid4[1])
+ved.rente[5] <- 100*obl[5,2]*(1-tid5[1])
+ved.rente[6] <- 100*obl[6,2]*(1-tid6[1])
+ved.rente[7] <- 100*obl[7,2]*(1-tid7[1])
+ved.rente[8] <- 100*obl[8,2]*(1-tid8[1])
+ved.rente[9] <- 100*obl[9,2]*(1-tid9[1])
+ved.rente[10] <- 100*obl[10,2]*(1-tid10[1])
+ved.rente[11] <- 100*obl[11,2]*(1-tid11[1])
+ved.rente[12] <- 100*obl[12,2]*(1-tid12[1])
+ved.rente[13] <- 100*obl[13,2]*(1-tid13[1])
+
+
+z_ny <- z+ved.rente
+```
+
+
+Vi mangler nu at bestemme koefficienterne til parameterne i det lineære system.\
+Lad os først bestemme $k$
+
+```{r}
+sqrt(length(obl[,1]))
+```
+
+Hvilket betyder at $k=4$ (det tætteste heltal), og antal af parameter i vores model er $k+2$. Altså 6 parameter.\
+Koefficienterne til parameterne for $\beta_0, \gamma_0, \delta_0$ bestemmes først
+
+```{r}
+beta0 <- c(1:length(obl[,1]))
+beta0[1] <- crossprod(ydelse1, tid1)
+beta0[2] <- crossprod(ydelse2, tid2)
+beta0[3] <- crossprod(ydelse3, tid3)
+beta0[4] <- crossprod(ydelse4, tid4)
+beta0[5] <- crossprod(ydelse5, tid5)
+beta0[6] <- crossprod(ydelse6, tid6)
+beta0[7] <- crossprod(ydelse7, tid7)
+beta0[8] <- crossprod(ydelse8, tid8)
+beta0[9] <- crossprod(ydelse9, tid9)
+beta0[10] <- crossprod(ydelse10, tid10)
+beta0[11] <- crossprod(ydelse11, tid11)
+beta0[12] <- crossprod(ydelse12, tid12)
+beta0[13] <- crossprod(ydelse13, tid13)
+
+
+gamma0 <- c(1:length(obl[,1]))
+gamma0[1] <- crossprod(ydelse1, tid1^2)
+gamma0[2] <- crossprod(ydelse2, tid2^2)
+gamma0[3] <- crossprod(ydelse3, tid3^2)
+gamma0[4] <- crossprod(ydelse4, tid4^2)
+gamma0[5] <- crossprod(ydelse5, tid5^2)
+gamma0[6] <- crossprod(ydelse6, tid6^2)
+gamma0[7] <- crossprod(ydelse7, tid7^2)
+gamma0[8] <- crossprod(ydelse8, tid8^2)
+gamma0[9] <- crossprod(ydelse9, tid9^2)
+gamma0[10] <- crossprod(ydelse10, tid10^2)
+gamma0[11] <- crossprod(ydelse11, tid11^2)
+gamma0[12] <- crossprod(ydelse12, tid12^2)
+gamma0[13] <- crossprod(ydelse13, tid13^2)
+
+
+delta0 <- c(1:length(obl[,1]))
+delta0[1] <- crossprod(ydelse1, tid1^3)
+delta0[2] <- crossprod(ydelse2, tid2^3)
+delta0[3] <- crossprod(ydelse3, tid3^3)
+delta0[4] <- crossprod(ydelse4, tid4^3)
+delta0[5] <- crossprod(ydelse5, tid5^3)
+delta0[6] <- crossprod(ydelse6, tid6^3)
+delta0[7] <- crossprod(ydelse7, tid7^3)
+delta0[8] <- crossprod(ydelse8, tid8^3)
+delta0[9] <- crossprod(ydelse9, tid9^3)
+delta0[10] <- crossprod(ydelse10, tid10^3)
+delta0[11] <- crossprod(ydelse11, tid11^3)
+delta0[12] <- crossprod(ydelse12, tid12^3)
+delta0[13] <- crossprod(ydelse13, tid13^3)
+
+
+beta0
+gamma0
+delta0
+```
+
+Vi bestemmer nu koefficienterne til de resterende $k-1$ parametre, $\delta_1, \delta_2$ og $\delta_3$.\
+Men vi skal først definere stepfunktion $I_j(t)$ og bestemme knudepunkterne $\tau_1, \tau_2, \tau_2, \tau_4$.
+
+Bestemmer knudepunkterne $\tau_1, \tau_2, \tau_2, \tau_4$ sådan som McCulloch foreslår.
+
+```{r}
+M <- length(obl[,1])
+k <- 4
+
+h1 <- floor(1*M/k)
+h2 <- floor(2*M/k)
+h3 <- floor(3*M/k)
+h4 <- floor(4*M/k)
+
+theta1 <- 1*M/k-h1
+theta2 <- 2*M/k-h2
+theta3 <- 3*M/k-h3
+theta4 <- 4*M/k-h4
+
+h1
+h2
+h3
+h4
+```
+
+Knudepunkterne er derved bestemt ved jævnfør McCulloch
+
+```{r}
+tau1 <- tail(tid3,n=1)+ theta1*(tail(tid4,n=1)-tail(tid3, n=1))
+tau2 <- tail(tid6,n=1)+ theta1*(tail(tid7,n=1)-tail(tid6, n=1))
+tau3 <- tail(tid9,n=1)+ theta1*(tail(tid10,n=1)-tail(tid9, n=1))
+tau4 <- tail(tid13, n=1)
+tau1
+tau2
+tau3
+tau4
+```
+
+Definere de $k-1$ stepfunktioner. Altså 3 styks.
+
+```{r}
+stepfunktion1 <- function(x){
+  if(x>=tau1){
+    1
+  }else{
+    0
+  }
+}
+
+stepfunktion2 <- function(x){
+  if(x>=tau2){
+    1
+  }else{
+    0
+  }
+}
+
+stepfunktion3 <- function(x){
+  if(x>=tau3){
+    1
+  }else{
+    0
+  }
+}
+```
+
+Bestemmer koefficienterne til de tre resterende parametre $\delta_1, \delta_2, \delta_3$
+
+```{r}
+delta1 <- c(1:length(obl[,1]))
+
+delta1[1] <- ydelse1[1]*(tid1[1]-tau1)^3*stepfunktion1(tid1[1])+
+  ydelse1[2]*(tid1[2]-tau1)^3*stepfunktion1(tid1[2])
+
+delta1[2] <- ydelse2[1]*(tid2[1]-tau1)^3*stepfunktion1(tid2[1])+
+  ydelse2[2]*(tid2[2]-tau1)^3*stepfunktion1(tid2[2])
+
+delta1[3] <- ydelse3[1]*(tid3[1]-tau1)^3*stepfunktion1(tid3[1]) +
+             ydelse3[2]*(tid3[2]-tau1)^3*stepfunktion1(tid3[2])+
+             ydelse3[3]*(tid3[3]-tau1)^3*stepfunktion1(tid3[3])
+
+delta1[4] <- ydelse4[1]*(tid4[1]-tau1)^3*stepfunktion1(tid4[1]) +
+             ydelse4[2]*(tid4[2]-tau1)^3*stepfunktion1(tid4[2])+
+             ydelse4[3]*(tid4[3]-tau1)^3*stepfunktion1(tid4[3])
+
+delta1[5] <- ydelse5[1]*(tid5[1]-tau1)^3*stepfunktion1(tid5[1]) +
+             ydelse5[2]*(tid5[2]-tau1)^3*stepfunktion1(tid5[2]) +
+             ydelse5[3]*(tid5[3]-tau1)^3*stepfunktion1(tid5[3]) +
+             ydelse5[4]*(tid5[4]-tau1)^3*stepfunktion1(tid5[4])
+
+delta1[6] <- ydelse6[1]*(tid6[1]-tau1)^3*stepfunktion1(tid6[1]) +
+             ydelse6[2]*(tid6[2]-tau1)^3*stepfunktion1(tid6[2]) +
+             ydelse6[3]*(tid6[3]-tau1)^3*stepfunktion1(tid6[3]) +
+             ydelse6[4]*(tid6[4]-tau1)^3*stepfunktion1(tid6[4]) +
+             ydelse6[5]*(tid6[5]-tau1)^3*stepfunktion1(tid6[5])
+
+
+delta1[7] <- ydelse7[1]*(tid7[1]-tau1)^3*stepfunktion1(tid7[1]) +
+             ydelse7[2]*(tid7[2]-tau1)^3*stepfunktion1(tid7[2]) +
+             ydelse7[3]*(tid7[3]-tau1)^3*stepfunktion1(tid7[3]) +
+             ydelse7[4]*(tid7[4]-tau1)^3*stepfunktion1(tid7[4]) +
+             ydelse7[5]*(tid7[5]-tau1)^3*stepfunktion1(tid7[5])
+
+delta1[8] <- ydelse8[1]*(tid8[1]-tau1)^3*stepfunktion1(tid8[1]) +
+             ydelse8[2]*(tid8[2]-tau1)^3*stepfunktion1(tid8[2]) +
+             ydelse8[3]*(tid8[3]-tau1)^3*stepfunktion1(tid8[3]) +
+             ydelse8[4]*(tid8[4]-tau1)^3*stepfunktion1(tid8[4]) +
+             ydelse8[5]*(tid8[5]-tau1)^3*stepfunktion1(tid8[5]) +
+             ydelse8[6]*(tid8[6]-tau1)^3*stepfunktion1(tid8[6])
+
+delta1[9] <- ydelse9[1]*(tid9[1]-tau1)^3*stepfunktion1(tid9[1]) +
+              ydelse9[2]*(tid9[2]-tau1)^3*stepfunktion1(tid9[2]) +
+              ydelse9[3]*(tid9[3]-tau1)^3*stepfunktion1(tid9[3]) +
+              ydelse9[4]*(tid9[4]-tau1)^3*stepfunktion1(tid9[4]) +
+              ydelse9[5]*(tid9[5]-tau1)^3*stepfunktion1(tid9[5]) +
+              ydelse9[6]*(tid9[6]-tau1)^3*stepfunktion1(tid9[6]) +
+              ydelse9[7]*(tid9[7]-tau1)^3*stepfunktion1(tid9[7])
+
+delta1[10] <- ydelse10[1]*(tid10[1]-tau1)^3*stepfunktion1(tid10[1]) +
+              ydelse10[2]*(tid10[2]-tau1)^3*stepfunktion1(tid10[2]) +
+              ydelse10[3]*(tid10[3]-tau1)^3*stepfunktion1(tid10[3]) +
+              ydelse10[4]*(tid10[4]-tau1)^3*stepfunktion1(tid10[4]) +
+              ydelse10[5]*(tid10[5]-tau1)^3*stepfunktion1(tid10[5]) +
+              ydelse10[6]*(tid10[6]-tau1)^3*stepfunktion1(tid10[6]) +
+              ydelse10[7]*(tid10[7]-tau1)^3*stepfunktion1(tid10[7]) +
+              ydelse10[8]*(tid10[8]-tau1)^3*stepfunktion1(tid10[8]) +
+              ydelse10[9]*(tid10[9]-tau1)^3*stepfunktion1(tid10[9])
+
+delta1[11] <- ydelse11[1]*(tid11[1]-tau1)^3*stepfunktion1(tid11[1]) +
+              ydelse11[2]*(tid11[2]-tau1)^3*stepfunktion1(tid11[2]) +
+              ydelse11[3]*(tid11[3]-tau1)^3*stepfunktion1(tid11[3]) +
+              ydelse11[4]*(tid11[4]-tau1)^3*stepfunktion1(tid11[4]) +
+              ydelse11[5]*(tid11[5]-tau1)^3*stepfunktion1(tid11[5]) +
+              ydelse11[6]*(tid11[6]-tau1)^3*stepfunktion1(tid11[6]) +
+              ydelse11[7]*(tid11[7]-tau1)^3*stepfunktion1(tid11[7]) +
+              ydelse11[8]*(tid11[8]-tau1)^3*stepfunktion1(tid11[8]) +
+              ydelse11[9]*(tid11[9]-tau1)^3*stepfunktion1(tid11[9]) + 
+              ydelse11[10]*(tid11[10]-tau1)^3*stepfunktion1(tid11[10])+ 
+              ydelse11[11]*(tid11[11]-tau1)^3*stepfunktion1(tid11[11])
+
+delta1[12] <- ydelse12[1]*(tid12[1]-tau1)^3*stepfunktion1(tid12[1]) +
+              ydelse12[2]*(tid12[2]-tau1)^3*stepfunktion1(tid12[2]) +
+              ydelse12[3]*(tid12[3]-tau1)^3*stepfunktion1(tid12[3]) +
+              ydelse12[4]*(tid12[4]-tau1)^3*stepfunktion1(tid12[4]) +
+              ydelse12[5]*(tid12[5]-tau1)^3*stepfunktion1(tid12[5]) +
+              ydelse12[6]*(tid12[6]-tau1)^3*stepfunktion1(tid12[6]) +
+              ydelse12[7]*(tid12[7]-tau1)^3*stepfunktion1(tid12[7]) +
+              ydelse12[8]*(tid12[8]-tau1)^3*stepfunktion1(tid12[8]) +
+              ydelse12[9]*(tid12[9]-tau1)^3*stepfunktion1(tid12[9]) + 
+              ydelse12[10]*(tid12[10]-tau1)^3*stepfunktion1(tid12[10]) +
+              ydelse12[11]*(tid12[11]-tau1)^3*stepfunktion1(tid12[11]) +
+              ydelse12[12]*(tid12[12]-tau1)^3*stepfunktion1(tid12[12])
+
+delta1[13] <- ydelse13[1]*(tid13[1]-tau1)^3*stepfunktion1(tid13[1]) +
+              ydelse13[2]*(tid13[2]-tau1)^3*stepfunktion1(tid13[2]) +
+              ydelse13[3]*(tid13[3]-tau1)^3*stepfunktion1(tid13[3]) +
+              ydelse13[4]*(tid13[4]-tau1)^3*stepfunktion1(tid13[4]) +
+              ydelse13[5]*(tid13[5]-tau1)^3*stepfunktion1(tid13[5]) +
+              ydelse13[6]*(tid13[6]-tau1)^3*stepfunktion1(tid13[6]) +
+              ydelse13[7]*(tid13[7]-tau1)^3*stepfunktion1(tid13[7]) +
+              ydelse13[8]*(tid13[8]-tau1)^3*stepfunktion1(tid13[8]) +
+              ydelse13[9]*(tid13[9]-tau1)^3*stepfunktion1(tid13[9]) + 
+              ydelse13[10]*(tid13[10]-tau1)^3*stepfunktion1(tid13[10]) +
+              ydelse13[11]*(tid13[11]-tau1)^3*stepfunktion1(tid13[11]) +
+              ydelse13[12]*(tid13[12]-tau1)^3*stepfunktion1(tid13[12]) +
+              ydelse13[13]*(tid13[13]-tau1)^3*stepfunktion1(tid13[13]) +
+              ydelse13[14]*(tid13[14]-tau1)^3*stepfunktion1(tid13[14]) +
+              ydelse13[15]*(tid13[15]-tau1)^3*stepfunktion1(tid13[15]) +
+              ydelse13[16]*(tid13[16]-tau1)^3*stepfunktion1(tid13[16]) +
+              ydelse13[17]*(tid13[17]-tau1)^3*stepfunktion1(tid13[17]) +
+              ydelse13[18]*(tid13[18]-tau1)^3*stepfunktion1(tid13[18]) +
+              ydelse13[19]*(tid13[19]-tau1)^3*stepfunktion1(tid13[19]) + 
+              ydelse13[20]*(tid13[20]-tau1)^3*stepfunktion1(tid13[20]) + 
+              ydelse13[21]*(tid13[21]-tau1)^3*stepfunktion1(tid13[21])
+
+delta1
+
+
+delta2 <- c(1:length(obl[,1]))
+
+delta2[1] <- ydelse1[1]*(tid1[1]-tau2)^3*stepfunktion2(tid1[1])+
+  ydelse1[2]*(tid1[2]-tau2)^3*stepfunktion2(tid1[2])
+
+delta2[2] <- ydelse2[1]*(tid2[1]-tau2)^3*stepfunktion2(tid2[1])+
+  ydelse2[2]*(tid2[2]-tau2)^3*stepfunktion2(tid2[2])
+
+delta2[3] <- ydelse3[1]*(tid3[1]-tau2)^3*stepfunktion2(tid3[1]) +
+             ydelse3[2]*(tid3[2]-tau2)^3*stepfunktion2(tid3[2]) +
+             ydelse3[3]*(tid3[3]-tau2)^3*stepfunktion2(tid3[3])
+
+delta2[4] <- ydelse4[1]*(tid4[1]-tau2)^3*stepfunktion2(tid4[1]) +
+             ydelse4[2]*(tid4[2]-tau2)^3*stepfunktion2(tid4[2]) +
+             ydelse4[3]*(tid4[3]-tau2)^3*stepfunktion2(tid4[3])
+
+delta2[5] <- ydelse5[1]*(tid5[1]-tau2)^3*stepfunktion2(tid5[1]) +
+             ydelse5[2]*(tid5[2]-tau2)^3*stepfunktion2(tid5[2]) +
+             ydelse5[3]*(tid5[3]-tau2)^3*stepfunktion2(tid5[3])
+
+delta2[6] <- ydelse6[1]*(tid6[1]-tau2)^3*stepfunktion2(tid6[1]) +
+             ydelse6[2]*(tid6[2]-tau2)^3*stepfunktion2(tid6[2]) +
+             ydelse6[3]*(tid6[3]-tau2)^3*stepfunktion2(tid6[3]) +
+             ydelse6[4]*(tid6[4]-tau2)^3*stepfunktion2(tid6[4]) +
+             ydelse6[5]*(tid6[5]-tau2)^3*stepfunktion2(tid6[5])
+
+
+delta2[7] <- ydelse7[1]*(tid7[1]-tau2)^3*stepfunktion2(tid7[1]) +
+             ydelse7[2]*(tid7[2]-tau2)^3*stepfunktion2(tid7[2]) +
+             ydelse7[3]*(tid7[3]-tau2)^3*stepfunktion2(tid7[3]) +
+             ydelse7[4]*(tid7[4]-tau2)^3*stepfunktion2(tid7[4]) +
+             ydelse7[5]*(tid7[5]-tau2)^3*stepfunktion2(tid7[5])
+
+delta2[8] <- ydelse8[1]*(tid8[1]-tau2)^3*stepfunktion2(tid8[1]) +
+             ydelse8[2]*(tid8[2]-tau2)^3*stepfunktion2(tid8[2]) +
+             ydelse8[3]*(tid8[3]-tau2)^3*stepfunktion2(tid8[3]) +
+             ydelse8[4]*(tid8[4]-tau2)^3*stepfunktion2(tid8[4]) +
+             ydelse8[5]*(tid8[5]-tau2)^3*stepfunktion2(tid8[5]) +
+             ydelse8[6]*(tid8[6]-tau2)^3*stepfunktion2(tid8[6])
+
+delta2[9] <- ydelse9[1]*(tid9[1]-tau2)^3*stepfunktion2(tid9[1]) +
+              ydelse9[2]*(tid9[2]-tau2)^3*stepfunktion2(tid9[2]) +
+              ydelse9[3]*(tid9[3]-tau2)^3*stepfunktion2(tid9[3]) +
+              ydelse9[4]*(tid9[4]-tau2)^3*stepfunktion2(tid9[4]) +
+              ydelse9[5]*(tid9[5]-tau2)^3*stepfunktion2(tid9[5]) +
+              ydelse9[6]*(tid9[6]-tau2)^3*stepfunktion2(tid9[6]) +
+              ydelse9[7]*(tid9[7]-tau2)^3*stepfunktion2(tid9[7])
+
+delta2[10] <- ydelse10[1]*(tid10[1]-tau2)^3*stepfunktion2(tid10[1]) +
+              ydelse10[2]*(tid10[2]-tau2)^3*stepfunktion2(tid10[2]) +
+              ydelse10[3]*(tid10[3]-tau2)^3*stepfunktion2(tid10[3]) +
+              ydelse10[4]*(tid10[4]-tau2)^3*stepfunktion2(tid10[4]) +
+              ydelse10[5]*(tid10[5]-tau2)^3*stepfunktion2(tid10[5]) +
+              ydelse10[6]*(tid10[6]-tau2)^3*stepfunktion2(tid10[6]) +
+              ydelse10[7]*(tid10[7]-tau2)^3*stepfunktion2(tid10[7]) +
+              ydelse10[8]*(tid10[8]-tau2)^3*stepfunktion2(tid10[8]) +
+              ydelse10[9]*(tid10[9]-tau2)^3*stepfunktion2(tid10[9])
+
+delta2[11] <- ydelse11[1]*(tid11[1]-tau2)^3*stepfunktion2(tid11[1]) +
+              ydelse11[2]*(tid11[2]-tau2)^3*stepfunktion2(tid11[2]) +
+              ydelse11[3]*(tid11[3]-tau2)^3*stepfunktion2(tid11[3]) +
+              ydelse11[4]*(tid11[4]-tau2)^3*stepfunktion2(tid11[4]) +
+              ydelse11[5]*(tid11[5]-tau2)^3*stepfunktion2(tid11[5]) +
+              ydelse11[6]*(tid11[6]-tau2)^3*stepfunktion2(tid11[6]) +
+              ydelse11[7]*(tid11[7]-tau2)^3*stepfunktion2(tid11[7]) +
+              ydelse11[8]*(tid11[8]-tau2)^3*stepfunktion2(tid11[8]) +
+              ydelse11[9]*(tid11[9]-tau2)^3*stepfunktion2(tid11[9]) + 
+              ydelse11[10]*(tid11[10]-tau2)^3*stepfunktion2(tid11[10]) + 
+              ydelse11[11]*(tid11[11]-tau2)^3*stepfunktion2(tid11[11])
+
+delta2[12] <- ydelse12[1]*(tid12[1]-tau2)^3*stepfunktion2(tid12[1]) +
+              ydelse12[2]*(tid12[2]-tau2)^3*stepfunktion2(tid12[2]) +
+              ydelse12[3]*(tid12[3]-tau2)^3*stepfunktion2(tid12[3]) +
+              ydelse12[4]*(tid12[4]-tau2)^3*stepfunktion2(tid12[4]) +
+              ydelse12[5]*(tid12[5]-tau2)^3*stepfunktion2(tid12[5]) +
+              ydelse12[6]*(tid12[6]-tau2)^3*stepfunktion2(tid12[6]) +
+              ydelse12[7]*(tid12[7]-tau2)^3*stepfunktion2(tid12[7]) +
+              ydelse12[8]*(tid12[8]-tau2)^3*stepfunktion2(tid12[8]) +
+              ydelse12[9]*(tid12[9]-tau2)^3*stepfunktion2(tid12[9]) + 
+              ydelse12[10]*(tid12[10]-tau2)^3*stepfunktion2(tid12[10]) +
+              ydelse12[11]*(tid12[11]-tau2)^3*stepfunktion2(tid12[11]) +
+              ydelse12[12]*(tid12[12]-tau2)^3*stepfunktion2(tid12[12])
+
+delta2[13] <- ydelse13[1]*(tid13[1]-tau2)^3*stepfunktion2(tid13[1]) +
+              ydelse13[2]*(tid13[2]-tau2)^3*stepfunktion2(tid13[2]) +
+              ydelse13[3]*(tid13[3]-tau2)^3*stepfunktion2(tid13[3]) +
+              ydelse13[4]*(tid13[4]-tau2)^3*stepfunktion2(tid13[4]) +
+              ydelse13[5]*(tid13[5]-tau2)^3*stepfunktion2(tid13[5]) +
+              ydelse13[6]*(tid13[6]-tau2)^3*stepfunktion2(tid13[6]) +
+              ydelse13[7]*(tid13[7]-tau2)^3*stepfunktion2(tid13[7]) +
+              ydelse13[8]*(tid13[8]-tau2)^3*stepfunktion2(tid13[8]) +
+              ydelse13[9]*(tid13[9]-tau2)^3*stepfunktion2(tid13[9]) + 
+              ydelse13[10]*(tid13[10]-tau2)^3*stepfunktion2(tid13[10]) +
+              ydelse13[11]*(tid13[11]-tau2)^3*stepfunktion2(tid13[11]) +
+              ydelse13[12]*(tid13[12]-tau2)^3*stepfunktion2(tid13[12]) +
+              ydelse13[13]*(tid13[13]-tau2)^3*stepfunktion2(tid13[13]) +
+              ydelse13[14]*(tid13[14]-tau2)^3*stepfunktion2(tid13[14]) +
+              ydelse13[15]*(tid13[15]-tau2)^3*stepfunktion2(tid13[15]) +
+              ydelse13[16]*(tid13[16]-tau2)^3*stepfunktion2(tid13[16]) +
+              ydelse13[17]*(tid13[17]-tau2)^3*stepfunktion2(tid13[17]) +
+              ydelse13[18]*(tid13[18]-tau2)^3*stepfunktion2(tid13[18]) +
+              ydelse13[19]*(tid13[19]-tau2)^3*stepfunktion2(tid13[19]) + 
+              ydelse13[20]*(tid13[20]-tau2)^3*stepfunktion2(tid13[20]) + 
+              ydelse13[21]*(tid13[21]-tau2)^3*stepfunktion2(tid13[21])
+
+
+delta2
+
+delta3 <- c(1:length(obl[,1]))
+
+delta3[1] <- ydelse1[1]*(tid1[1]-tau3)^3*stepfunktion3(tid1[1])+
+  ydelse1[2]*(tid1[2]-tau3)^3*stepfunktion3(tid1[2])
+
+delta3[2] <- ydelse2[1]*(tid2[1]-tau3)^3*stepfunktion3(tid2[1])+
+  ydelse2[2]*(tid2[2]-tau3)^3*stepfunktion3(tid2[2])
+
+delta3[3] <- ydelse3[1]*(tid3[1]-tau3)^3*stepfunktion3(tid3[1]) +
+             ydelse3[2]*(tid3[2]-tau3)^3*stepfunktion3(tid3[2]) +
+             ydelse3[3]*(tid3[3]-tau3)^3*stepfunktion3(tid3[3])
+
+delta3[4] <- ydelse4[1]*(tid4[1]-tau3)^3*stepfunktion3(tid4[1]) +
+             ydelse4[2]*(tid4[2]-tau3)^3*stepfunktion3(tid4[2]) +
+             ydelse4[3]*(tid4[3]-tau3)^3*stepfunktion3(tid4[3])
+
+delta3[5] <- ydelse5[1]*(tid5[1]-tau3)^3*stepfunktion3(tid5[1]) +
+             ydelse5[2]*(tid5[2]-tau3)^3*stepfunktion3(tid5[2]) +
+             ydelse5[3]*(tid5[3]-tau3)^3*stepfunktion3(tid5[3]) +
+             ydelse5[4]*(tid5[4]-tau3)^3*stepfunktion3(tid5[4])
+
+delta3[6] <- ydelse6[1]*(tid6[1]-tau3)^3*stepfunktion3(tid6[1]) +
+             ydelse6[2]*(tid6[2]-tau3)^3*stepfunktion3(tid6[2]) +
+             ydelse6[3]*(tid6[3]-tau3)^3*stepfunktion3(tid6[3]) +
+             ydelse6[4]*(tid6[4]-tau3)^3*stepfunktion3(tid6[4]) +
+             ydelse6[5]*(tid6[5]-tau3)^3*stepfunktion3(tid6[5])
+
+
+delta3[7] <- ydelse7[1]*(tid7[1]-tau3)^3*stepfunktion3(tid7[1]) +
+             ydelse7[2]*(tid7[2]-tau3)^3*stepfunktion3(tid7[2]) +
+             ydelse7[3]*(tid7[3]-tau3)^3*stepfunktion3(tid7[3]) +
+             ydelse7[4]*(tid7[4]-tau3)^3*stepfunktion3(tid7[4]) +
+             ydelse7[5]*(tid7[5]-tau3)^3*stepfunktion3(tid7[5])
+
+delta3[8] <- ydelse8[1]*(tid8[1]-tau3)^3*stepfunktion3(tid8[1]) +
+             ydelse8[2]*(tid8[2]-tau3)^3*stepfunktion3(tid8[2]) +
+             ydelse8[3]*(tid8[3]-tau3)^3*stepfunktion3(tid8[3]) +
+             ydelse8[4]*(tid8[4]-tau3)^3*stepfunktion3(tid8[4]) +
+             ydelse8[5]*(tid8[5]-tau3)^3*stepfunktion3(tid8[5]) +
+             ydelse8[6]*(tid8[6]-tau3)^3*stepfunktion3(tid8[6])
+
+delta3[9] <- ydelse9[1]*(tid9[1]-tau3)^3*stepfunktion3(tid9[1]) +
+              ydelse9[2]*(tid9[2]-tau3)^3*stepfunktion3(tid9[2]) +
+              ydelse9[3]*(tid9[3]-tau3)^3*stepfunktion3(tid9[3]) +
+              ydelse9[4]*(tid9[4]-tau3)^3*stepfunktion3(tid9[4]) +
+              ydelse9[5]*(tid9[5]-tau3)^3*stepfunktion3(tid9[5]) +
+              ydelse9[6]*(tid9[6]-tau3)^3*stepfunktion3(tid9[6]) +
+              ydelse9[7]*(tid9[7]-tau3)^3*stepfunktion3(tid9[7])
+
+delta3[10] <- ydelse10[1]*(tid10[1]-tau3)^3*stepfunktion3(tid10[1]) +
+              ydelse10[2]*(tid10[2]-tau3)^3*stepfunktion3(tid10[2]) +
+              ydelse10[3]*(tid10[3]-tau3)^3*stepfunktion3(tid10[3]) +
+              ydelse10[4]*(tid10[4]-tau3)^3*stepfunktion3(tid10[4]) +
+              ydelse10[5]*(tid10[5]-tau3)^3*stepfunktion3(tid10[5]) +
+              ydelse10[6]*(tid10[6]-tau3)^3*stepfunktion3(tid10[6]) +
+              ydelse10[7]*(tid10[7]-tau3)^3*stepfunktion3(tid10[7]) +
+              ydelse10[8]*(tid10[8]-tau3)^3*stepfunktion3(tid10[8]) +
+              ydelse10[9]*(tid10[9]-tau3)^3*stepfunktion3(tid10[9])
+
+delta3[11] <- ydelse11[1]*(tid11[1]-tau3)^3*stepfunktion3(tid11[1]) +
+              ydelse11[2]*(tid11[2]-tau3)^3*stepfunktion3(tid11[2]) +
+              ydelse11[3]*(tid11[3]-tau3)^3*stepfunktion3(tid11[3]) +
+              ydelse11[4]*(tid11[4]-tau3)^3*stepfunktion3(tid11[4]) +
+              ydelse11[5]*(tid11[5]-tau3)^3*stepfunktion3(tid11[5]) +
+              ydelse11[6]*(tid11[6]-tau3)^3*stepfunktion3(tid11[6]) +
+              ydelse11[7]*(tid11[7]-tau3)^3*stepfunktion3(tid11[7]) +
+              ydelse11[8]*(tid11[8]-tau3)^3*stepfunktion3(tid11[8]) +
+              ydelse11[9]*(tid11[9]-tau3)^3*stepfunktion3(tid11[9]) + 
+              ydelse11[10]*(tid11[10]-tau3)^3*stepfunktion3(tid11[10]) + 
+              ydelse11[11]*(tid11[11]-tau3)^3*stepfunktion3(tid11[11])
+
+delta3[12] <- ydelse12[1]*(tid12[1]-tau3)^3*stepfunktion3(tid12[1]) +
+              ydelse12[2]*(tid12[2]-tau3)^3*stepfunktion3(tid12[2]) +
+              ydelse12[3]*(tid12[3]-tau3)^3*stepfunktion3(tid12[3]) +
+              ydelse12[4]*(tid12[4]-tau3)^3*stepfunktion3(tid12[4]) +
+              ydelse12[5]*(tid12[5]-tau3)^3*stepfunktion3(tid12[5]) +
+              ydelse12[6]*(tid12[6]-tau3)^3*stepfunktion3(tid12[6]) +
+              ydelse12[7]*(tid12[7]-tau3)^3*stepfunktion3(tid12[7]) +
+              ydelse12[8]*(tid12[8]-tau3)^3*stepfunktion3(tid12[8]) +
+              ydelse12[9]*(tid12[9]-tau3)^3*stepfunktion3(tid12[9]) + 
+              ydelse12[10]*(tid12[10]-tau3)^3*stepfunktion3(tid12[10]) +
+              ydelse12[11]*(tid12[11]-tau3)^3*stepfunktion3(tid12[11]) +
+              ydelse12[12]*(tid12[12]-tau3)^3*stepfunktion3(tid12[12])
+
+delta3[13] <- ydelse13[1]*(tid13[1]-tau3)^3*stepfunktion3(tid13[1]) +
+              ydelse13[2]*(tid13[2]-tau3)^3*stepfunktion3(tid13[2]) +
+              ydelse13[3]*(tid13[3]-tau3)^3*stepfunktion3(tid13[3]) +
+              ydelse13[4]*(tid13[4]-tau3)^3*stepfunktion3(tid13[4]) +
+              ydelse13[5]*(tid13[5]-tau3)^3*stepfunktion3(tid13[5]) +
+              ydelse13[6]*(tid13[6]-tau3)^3*stepfunktion3(tid13[6]) +
+              ydelse13[7]*(tid13[7]-tau3)^3*stepfunktion3(tid13[7]) +
+              ydelse13[8]*(tid13[8]-tau3)^3*stepfunktion3(tid13[8]) +
+              ydelse13[9]*(tid13[9]-tau3)^3*stepfunktion3(tid13[9]) + 
+              ydelse13[10]*(tid13[10]-tau3)^3*stepfunktion3(tid13[10]) +
+              ydelse13[11]*(tid13[11]-tau3)^3*stepfunktion3(tid13[11]) +
+              ydelse13[12]*(tid13[12]-tau3)^3*stepfunktion3(tid13[12]) +
+              ydelse13[13]*(tid13[13]-tau3)^3*stepfunktion3(tid13[13]) +
+              ydelse13[14]*(tid13[14]-tau3)^3*stepfunktion3(tid13[14]) +
+              ydelse13[15]*(tid13[15]-tau3)^3*stepfunktion3(tid13[15]) +
+              ydelse13[16]*(tid13[16]-tau3)^3*stepfunktion3(tid13[16]) +
+              ydelse13[17]*(tid13[17]-tau3)^3*stepfunktion3(tid13[17]) +
+              ydelse13[18]*(tid13[18]-tau3)^3*stepfunktion3(tid13[18]) +
+              ydelse13[19]*(tid13[19]-tau3)^3*stepfunktion3(tid13[19]) + 
+              ydelse13[20]*(tid13[20]-tau3)^3*stepfunktion3(tid13[20]) + 
+              ydelse13[21]*(tid13[21]-tau3)^3*stepfunktion3(tid13[21])
+
+
+delta3
+```
+
+Samler koefficenter i en matrix
+
+```{r}
+koeff <- matrix(1:1, nrow = M, ncol = k+2)
+
+koeff[,1] <- beta0
+koeff[,2] <- gamma0
+koeff[,3] <- delta0
+koeff[,4] <- delta1
+koeff[,5] <- delta2
+koeff[,6] <- delta3
+
+koeff
+```
+
+Forlænger matricen fra venstre med vektoren $\mathbf{z}$ (vestre siden i det lineære system)
+
+```{r}
+koeff_forskel <- cbind(z_ny, koeff)
+
+koeff_forskel
+```
+
+Vi har følgende data, som vi skal lave lineær regression over
+
+```{r}
+koeff_forskel_data <- data.frame(koeff_forskel)
+
+colnames(koeff_forskel_data) <- c("VS", "beta0", "gamma0", "delta0", "delta1",
+                                  "delta2", "delta3")
+koeff_forskel_data
+```
+
+Estimerer parametrene
+
+```{r}
+linear_model <- lm(VS~beta0 + gamma0 + delta0 + delta1 + delta2 + delta3, 
+                   data = koeff_forskel_data)
+summary(linear_model)
+```
+
+Definere McCulloch's cubic spline approximation af diskonteringsfunktionen
+
+```{r}
+parameter <- c(0.016117, -0.027020, 0.007312, -0.013672, 0.009637, -0.004012)
+diskontering <- function(t){
+  ifelse(t>=tau3, 1+parameter[1]*t+parameter[2]*t^2+parameter[3]*t^3+parameter[4]*(t-tau1)^3
+         +parameter[5]*(t-tau2)^3+parameter[6]*(t-tau3)^3,
+  ifelse(t>=tau2, 1+parameter[1]*t+parameter[2]*t^2+parameter[3]*t^3+parameter[4]*(t-tau1)^3
+         +parameter[5]*(t-tau2)^3, 
+  ifelse(t>=tau1, 1+parameter[1]*t+parameter[2]*t^2+parameter[3]*t^3+parameter[4]*(t-tau1)^3,
+         1+parameter[1]*t+parameter[2]*t^2+parameter[3]*t^3)))
+}
+
+{curve(diskontering, xlim = c(0.01, tau4), main = "Diskonteringfaktorkurven 3. april 2020"
+     , xlab="Tid til udløbsdato (år)", ylab ="Diskonteringsfaktor", col="blue")
+abline(v=c(tau1, tau2, tau3, tau4), lwd=0.5, lty=2, col="grey30")
+legend(0, 0.93, legend = c("McCulloch's Cubic Spline", "Knudepunker for McCulloch's Cubic Spline"), col = c("blue", "gray30"), lty=c(1,2), cex=0.8, box.lty=1, box.lwd=1, box.col="black")}
+```
+
+Bestemmer nulkuponrentefunktionen
+
+```{r}
+nulkupon <- function(t){
+  diskontering(t)^(-1/t)-1
+}
+
+{curve(nulkupon, xlim=c(tid1[1], tau4),main = "Nulkuponrentekurven 23. maj 2019",
+     xlab="Tid til udløbsdato (år)", ylab ="Nulkuponrente", col="blue")
+abline(v=c(tau1, tau2, tau3, tau4), lwd=0.5, lty=2, col="grey30")
+legend(10, 0.06, legend = c("McCulloch's Cubic Spline", "Knudepunker for McCulloch's Cubic Spline"), col = c("blue", "gray30"), lty=c(1,2), cex=0.8, box.lty=1, box.lwd=1, box.col="black")}
+```
+
+Bestemme forwardrentefunktionen
+
+```{r}
+forward <- function(t){
+  diskontering(t)/diskontering(t+1) -1
+}
+
+{curve(forward, xlim=c(tid1[1], tau4),main ="Forwardrentekurven 23. maj 2019",
+     xlab="Tid til udløbsdato (år)", ylab ="Forwardrente",col="blue")
+abline(v=c(tau1, tau2, tau3, tau4), lwd=0.5, lty=2)
+legend(9, -0.01, legend = c("McCulloch's Cubic Spline", "Knudepunker for McCulloch's Cubic Spline"), col = c("blue", "gray30"), lty=c(1,2), cex=0.8, box.lty=1, box.lwd=1, box.col="black")}
+```
+
+

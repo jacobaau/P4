@@ -1,0 +1,381 @@
+---
+title: "Bootstrapping - 23. Maj 2020"
+author: "Gruppe 4.215"
+date: "28/5/2020"
+output: pdf_document
+---
+
+Vi henter data på 14 statsobligationer fra nasdaq d. 23. maj 2020.
+
+```{r wrap-hook}
+library(lubridate)
+pris <- c(102.02, 101.356, 101.56, 109.114, 102.92, 102.45 ,109.169, 107.48, 141.57, 113.888, 105.74,
+          105.3, 113.56, 181.53)
+
+kupon <- c(0.01, 0.0025, 0.005, 0.03, 0.0025, 0.0063, 0.015, 0.001, 0.07, 0.0175, 0.005, 0.005,
+           0.001, 0.045)
+
+udlob <- c("2020-06-11", "2020-11-15", "2021-06-22", "2021-11-15", "2022-11-15", "2023-06-27",
+           "2023-11-15", "2023-11-15", "2024-11-10", "2025-11-15", "2027-11-15", "2029-11-15",
+           "2030-11-15", "2039-11-15")
+
+obl <- data.frame(udlob, kupon, pris)
+
+colnames(obl) <- c("Udløbsdato", "Kuponrente", "Pris")
+
+rownames(obl) <- c("Foroya Lan JUN20", "Danske stat 2020", "Foroya Lan JUN21", "3St.l. 21 DG",
+                   "Danske stat 2022", "Foroya Lan JUN23", "1.5St.l. 23 GB", "DGBI 2023 GB",
+                   "7St.l. 24 GB", "Danske stat 2025", "Danske stat 2027", "Danske stat 2029",
+                   "DGBi", "4.5St.l 39 GB")
+
+obl
+```
+
+Vi bestemmer hver terminsdato i obligationens løbetid
+
+```{r}
+termin1 <- c("2019-06-11", "2020-06-11")
+termin2 <- c("2019-11-15", "2020-11-15")
+termin3 <- c("2019-06-22", "2020-06-22", "2021-06-22")
+termin4 <- c("2019-11-15", "2020-11-15", "2021-11-15")
+termin5 <- c("2019-11-15", "2020-11-15", "2021-11-15", "2022-11-15")
+termin6 <- c("2019-06-27", "2020-06-27", "2021-06-27", "2022-06-27", "2023-06-27")
+termin7 <- c("2019-11-15", "2020-11-15","2021-11-15", "2022-11-15", "2023-11-15")
+termin8 <- c("2019-11-15", "2020-11-15","2021-11-15", "2022-11-15", "2023-11-15")
+termin9 <- c("2019-11-15", "2020-11-10", "2021-11-10", "2022-11-10", "2023-11-10", "2024-11-10")
+termin10 <- c("2019-11-15", "2020-11-15", "2021-11-15", "2022-11-15", "2023-11-15", "2024-11-15","2025-11-15")
+termin11 <- c("2019-11-15", "2020-11-15", "2021-11-15", "2022-11-15", "2023-11-15", "2024-11-15", "2025-11-15",
+              "2026-11-15", "2027-11-15")
+termin12 <- c("2019-11-15", "2020-11-15", "2021-11-15", "2022-11-15", "2023-11-15", "2024-11-15", "2025-11-15",
+              "2026-11-15", "2027-11-15", "2028-11-15", "2029-11-15")
+termin13 <- c("2019-11-15", "2020-11-15", "2021-11-15", "2022-11-15", "2023-11-15", "2024-11-15", "2025-11-15",
+              "2026-11-15", "2027-11-15", "2028-11-15", "2029-11-15", "2030-11-15")
+termin14 <- c("2019-11-15", "2020-11-15", "2021-11-15", "2022-11-15", "2023-11-15", "2024-11-15", "2025-11-15",
+              "2026-11-15", "2027-11-15", "2028-11-15", "2029-11-15", "2030-11-15", "2031-11-15",                  "2032-11-15", "2033-11-15", "2034-11-15", "2035-11-15", "2036-11-15", "2037-11-15",
+              "2038-11-15", "2039-11-15")
+```
+Vi bestemmer den tidsmæssige afstand (målt i år) fra i dag til hver kupondag for obligationerne $(t_1, t_2, \dots, t_N)$, hvor $t_N=T_N$ er den tidsmæssig afstand fra nu til udløbsdatoen (den sidste kupon dag).
+```{r}
+idag <- "2019-05-23"
+
+tid1 <- c(1:length(termin1))
+for(i in 1:length(termin1)){
+  tid1[i] <- time_length(difftime(as.Date(termin1[i]),as.Date(idag)), "years")
+}
+
+
+tid2 <- c(1:length(termin2))
+for(i in 1:length(termin2)){
+  tid2[i] <- time_length(difftime(as.Date(termin2[i]),as.Date(idag)), "years")
+}
+
+tid3 <- c(1:length(termin3))
+for(i in 1:length(termin3)){
+  tid3[i] <- time_length(difftime(as.Date(termin3[i]),as.Date(idag)), "years")
+}
+
+
+tid4 <- c(1:length(termin4))
+for(i in 1:length(termin4)){
+  tid4[i] <- time_length(difftime(as.Date(termin4[i]),as.Date(idag)), "years")
+}
+
+tid5 <- c(1:length(termin5))
+for(i in 1:length(termin5)){
+  tid5[i] <- time_length(difftime(as.Date(termin5[i]),as.Date(idag)), "years")
+}
+
+tid6 <- c(1:length(termin6))
+for(i in 1:length(termin6)){
+  tid6[i] <- time_length(difftime(as.Date(termin6[i]),as.Date(idag)), "years")
+}
+
+tid7 <- c(1:length(termin7))
+for(i in 1:length(termin7)){
+  tid7[i] <- time_length(difftime(as.Date(termin7[i]),as.Date(idag)), "years")
+}
+
+tid8 <- c(1:length(termin8))
+for(i in 1:length(termin8)){
+  tid8[i] <- time_length(difftime(as.Date(termin8[i]),as.Date(idag)), "years")
+}
+
+tid9 <- c(1:length(termin9))
+for(i in 1:length(termin9)){
+  tid9[i] <- time_length(difftime(as.Date(termin9[i]),as.Date(idag)), "years")
+}
+
+tid10 <- c(1:length(termin10))
+for(i in 1:length(termin10)){
+  tid10[i] <- time_length(difftime(as.Date(termin10[i]),as.Date(idag)), "years")
+}
+
+tid11 <- c(1:length(termin11))
+for(i in 1:length(termin11)){
+  tid11[i] <- time_length(difftime(as.Date(termin11[i]),as.Date(idag)), "years")
+}
+
+tid12 <- c(1:length(termin12))
+for(i in 1:length(termin12)){
+  tid12[i] <- time_length(difftime(as.Date(termin12[i]),as.Date(idag)), "years")
+}
+
+tid13 <- c(1:length(termin13))
+for(i in 1:length(termin13)){
+  tid13[i] <- time_length(difftime(as.Date(termin13[i]),as.Date(idag)), "years")
+}
+
+tid14 <- c(1:length(termin14))
+for(i in 1:length(termin14)){
+  tid14[i] <- time_length(difftime(as.Date(termin14[i]),as.Date(idag)), "years")
+}
+```
+
+Vi bestemmer nu ydelsesrækken for hver obligation. Vi antager at hovedstolen er 100.
+```{r}
+ydelse1 <- c(1:length(tid1))
+for(i in 1:(length(ydelse1)-1)){
+  ydelse1[i] <- 100*obl[1,2]
+  ydelse1[length(ydelse1)] <- 100*(1+obl[1,2])
+}
+
+ydelse2 <- c(1:length(tid2))
+for(i in 1:(length(ydelse2)-1)){
+  ydelse2[i] <- 100*obl[2,2]
+  ydelse2[length(ydelse2)] <- 100*(1+obl[2,2])
+}
+
+ydelse3 <- c(1:length(tid3))
+for(i in 1:(length(ydelse3)-1)){
+  ydelse3[i] <- 100*obl[3,2]
+  ydelse3[length(ydelse3)] <- 100*(1+obl[3,2])
+}
+
+ydelse4 <- c(1:length(tid4))
+for(i in 1:(length(ydelse4)-1)){
+  ydelse4[i] <- 100*obl[4,2]
+  ydelse4[length(ydelse4)] <- 100*(1+obl[4,2])
+}
+
+ydelse5 <- c(1:length(tid5))
+for(i in 1:(length(ydelse5)-1)){
+  ydelse5[i] <- 100*obl[5,2]
+  ydelse5[length(ydelse5)] <- 100*(1+obl[5,2])
+}
+
+ydelse6 <- c(1:length(tid6))
+for(i in 1:(length(ydelse6)-1)){
+  ydelse6[i] <- 100*obl[6,2]
+  ydelse6[length(ydelse6)] <- 100*(1+obl[6,2])
+}
+
+ydelse7 <- c(1:length(tid7))
+for(i in 1:(length(ydelse7)-1)){
+  ydelse7[i] <- 100*obl[7,2]
+  ydelse7[length(ydelse7)] <- 100*(1+obl[7,2])
+}
+
+ydelse8 <- c(1:length(tid8))
+for(i in 1:(length(ydelse8)-1)){
+  ydelse8[i] <- 100*obl[8,2]
+  ydelse8[length(ydelse8)] <- 100*(1+obl[8,2])
+} 
+
+ydelse9 <- c(1:length(tid9))
+for(i in 1:(length(ydelse9)-1)){
+  ydelse9[i] <- 100*obl[9,2]
+  ydelse9[length(ydelse9)] <- 100*(1+obl[9,2])
+}
+
+
+ydelse10 <- c(1:length(tid10))
+for(i in 1:(length(ydelse10)-1)){
+  ydelse10[i] <- 100*obl[10,2]
+  ydelse10[length(ydelse10)] <- 100*(1+obl[10,2])
+}
+
+ydelse11 <- c(1:length(tid11))
+for(i in 1:(length(ydelse11)-1)){
+  ydelse11[i] <- 100*obl[11,2]
+  ydelse11[length(ydelse11)] <- 100*(1+obl[11,2])
+}
+
+ydelse12 <- c(1:length(tid12))
+for(i in 1:(length(ydelse12)-1)){
+  ydelse12[i] <- 100*obl[12,2]
+  ydelse12[length(ydelse12)] <- 100*(1+obl[12,2])
+}
+
+ydelse13 <- c(1:length(tid13))
+for(i in 1:(length(ydelse13)-1)){
+  ydelse13[i] <- 100*obl[13,2]
+  ydelse13[length(ydelse13)] <- 100*(1+obl[13,2])
+}
+
+ydelse14 <- c(1:length(tid14))
+for(i in 1:(length(ydelse14)-1)){
+  ydelse14[i] <- 100*obl[14,2]
+  ydelse14[length(ydelse14)] <- 100*(1+obl[14,2])
+}
+
+```
+
+Bestemmer vedhængende rente
+
+```{r}
+ved.rente <- c(1:length(obl[,1]))
+
+ved.rente[1] <- 100*obl[1,2]*(1-tid1[1])
+ved.rente[2] <- 100*obl[2,2]*(1-tid2[1])
+ved.rente[3] <- 100*obl[3,2]*(1-tid3[1])
+ved.rente[4] <- 100*obl[4,2]*(1-tid4[1])
+ved.rente[5] <- 100*obl[5,2]*(1-tid5[1])
+ved.rente[6] <- 100*obl[6,2]*(1-tid6[1])
+ved.rente[7] <- 100*obl[7,2]*(1-tid7[1])
+ved.rente[8] <- 100*obl[8,2]*(1-tid8[1])
+ved.rente[9] <- 100*obl[9,2]*(1-tid9[1])
+ved.rente[10] <- 100*obl[10,2]*(1-tid10[1])
+ved.rente[11] <- 100*obl[11,2]*(1-tid11[1])
+ved.rente[12] <- 100*obl[12,2]*(1-tid12[1])
+ved.rente[13] <- 100*obl[13,2]*(1-tid13[1])
+ved.rente[14] <- 100*obl[14,2]*(1-tid14[1])
+```
+
+Samler tid til udløbsdato for hver obligation
+```{r}
+maturity <- c(1:length(obl[,1]))
+
+maturity[1] <- tid1[length(tid1)]
+maturity[2] <- tid2[length(tid2)]
+maturity[3] <- tid3[length(tid3)]
+maturity[4] <- tid4[length(tid4)]
+maturity[5] <- tid5[length(tid5)]
+maturity[6] <- tid6[length(tid6)]
+maturity[7] <- tid7[length(tid7)]
+maturity[8] <- tid8[length(tid8)]
+maturity[9] <- tid9[length(tid9)]
+maturity[10] <- tid10[length(tid10)]
+maturity[11] <- tid11[length(tid11)]
+maturity[12] <- tid12[length(tid12)]
+maturity[13] <- tid13[length(tid13)]
+maturity[14] <- tid14[length(tid14)]
+
+maturity
+
+#Da vi ikke har obligationer som udløber i 2019, kan vi ikke beregne den eksakte diskontering i 2019. Vi ignorer terminen om 0.05 år, og beregner diskonteringen i 2020 (som vores kick-starter i algoritmen/bootstrapping)
+
+#1.05 årige diskontering (antager at d_0.05 =d_1.05)
+d_1.05 <- (pris[1]+ved.rente[1])/(ydelse1[1]+ydelse1[2])
+d_1.05
+
+#1.48 år diskonteringsfaktor
+d_1.48 <- (pris[2]+ved.rente[2])/(ydelse2[1]+ydelse2[2])
+d_1.48 
+
+#2.08 år diskonteringsfaktor
+d_2.08 <- (pris[3]+ved.rente[3])/ydelse3[3] -(ydelse3[1]/ydelse3[3])*2*d_1.05
+d_2.08
+
+#2.48 år diskonteringsfaktor
+d_2.48 <- (pris[4]+ved.rente[4])/ydelse4[3] -(ydelse4[1]/ydelse4[3])*2*d_1.48
+d_2.48
+
+#3.48 år diskonteringsfaktor
+d_3.48 <- (pris[5]+ved.rente[5])/ydelse5[4] - (ydelse5[2]/ydelse5[4])*(2*d_1.48+d_2.48)
+d_3.48
+
+#4.09 år diskonteringsfaktor
+d_4.09 <- (pris[6]+ved.rente[6])/ydelse6[length(ydelse6)] - (ydelse6[2]/ydelse6[length(ydelse6)])*(2*d_2.08 + 2*d_1.05)
+d_4.09
+
+#(jf. obligation 7) 4.48 år diskonteringsfaktor
+d_4.48_1 <- (pris[7]+ved.rente[7])/ydelse7[length(ydelse7)] - (ydelse7[2]/ydelse7[length(ydelse7)])*(d_3.48+d_2.48+2*d_1.48)
+d_4.48_1
+
+#(jf. obligation 8) 4.48 år diskonteringsfaktor
+d_4.48_2 <- (pris[8]+ved.rente[8])/ydelse8[length(ydelse8)] - (ydelse8[2]/ydelse8[length(ydelse8)])*(d_3.48+d_2.48+2*d_1.48)
+d_4.48_2
+
+#4.48år diskonteringsfaktor er gennemsnittet
+d_4.48 <- (d_4.48_1+d_4.48_2)/2
+d_4.48
+
+#5.47 år diskonteringsfaktor
+d_5.47 <- (pris[9]+ved.rente[9])/ydelse9[length(ydelse9)] - (ydelse9[2]/ydelse9[length(ydelse9)])*
+  (d_4.48 + d_3.48+d_2.48+2*d_1.48)
+d_5.47
+
+#6.48 år diskonteringsfaktor
+d_6.48 <- (pris[10]+ved.rente[10])/ydelse10[length(ydelse10)] - (ydelse10[2]/ydelse10[length(ydelse10)])*
+  (d_5.47 + d_4.48 + d_3.48+d_2.48+2*d_1.48)
+d_6.48
+
+#8.48 år diskonteringsfaktor
+d_8.48 <- (pris[11]+ved.rente[11])/ydelse11[length(ydelse11)] - (ydelse11[2]/ydelse11[length(ydelse11)])*
+  (2*d_6.48+d_5.47 + d_4.48 + d_3.48+d_2.48+2*d_1.48)
+d_8.48
+
+#10.48 år diskonteringsfaktor
+d_10.48 <- (pris[12]+ved.rente[12])/ydelse12[length(ydelse12)] - (ydelse12[2]/ydelse12[length(ydelse12)])*
+  (2*d_8.48+2*d_6.48+d_5.47 + d_4.48 + d_3.48+d_2.48+2*d_1.48)
+d_10.48
+
+#11.48 år diskonteringsfaktor
+d_11.48 <- (pris[13]+ved.rente[13])/ydelse13[length(ydelse13)] - (ydelse13[2]/ydelse13[length(ydelse13)])*
+  (d_10.48+2*d_8.48+2*d_6.48+d_5.47 + d_4.48 + d_3.48+d_2.48+2*d_1.48)
+d_11.48
+
+#20.48 år diskonteringsfaktor
+d_20.48 <- (pris[14]+ved.rente[14])/ydelse14[length(ydelse14)] - (ydelse14[2]/ydelse14[length(ydelse14)])*
+  (9*d_11.48+d_10.48+2*d_8.48+2*d_6.48+d_5.47 + d_4.48 + d_3.48+d_2.48+2*d_1.48)
+d_20.48
+
+```
+
+Heraf kan vi beregne nulkuponrenterne til hver udløbsdato. Vi samler det hele i en tabel.
+```{r}
+d.renter <- c(1:(length(obl[,1])-1))
+
+d.renter[1] <- d_1.05
+d.renter[2] <- d_1.48 
+d.renter[3] <- d_2.08
+d.renter[4] <- d_2.48
+d.renter[5] <- d_3.48
+d.renter[6] <- d_4.09
+d.renter[7] <- d_4.48
+d.renter[8] <- d_5.47
+d.renter[9] <- d_6.48
+d.renter[10] <- d_8.48
+d.renter[11] <- d_10.48
+d.renter[12] <- d_11.48
+d.renter[13] <- d_20.48
+d.renter
+
+maturity1 <- maturity[-7]
+maturity1
+
+n.renter <- c(1:(length(obl[,1])-1))
+
+for(i in 1:length(n.renter)){
+  n.renter[i] <- (d.renter[i])^(-1/maturity1[i])-1
+}
+
+n.renter
+
+data.renter <- data.frame(maturity1, d.renter, n.renter)
+colnames(data.renter) <- c("udlob", "Diskonteringsfaktor", "Nulkuponrenter")
+data.renter
+
+```
+
+Lad os plotte punkterne
+
+```{r}
+plot(Nulkuponrenter~udlob, data = data.renter)
+
+
+
+
+
+```
+

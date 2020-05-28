@@ -1,0 +1,453 @@
+---
+title: "Nelson-Siegel Metode 2"
+author: "Gruppe 4.215"
+date: "28/5/2020"
+output: pdf_document
+---
+
+14 stående obligationer (danske statsobligationer)
+
+```{r}
+library(lubridate)
+pris <- c(100.696, 100.426, 101.342, 105.485, 102.04, 102.45, 103.7, 134.55, 112.276, 106.150,
+          106.811, 111.45, 187.4, 102.104)
+
+kupon <- c(0.01, 0.0025, 0.005, 0.03, 0.0025, 0.0063, 0.001, 0.07, 0.0175, 0.005, 0.005,
+           0.001, 0.045, 0.0025)
+
+udløb <- c("2020-06-11", "2020-11-15", "2021-06-22", "2021-11-15", "2022-11-15", "2023-06-27", "2023-11-15", "2024-11-10", "2025-11-15", "2027-11-15", "2029-11-15",
+           "2030-11-15", "2039-11-15", "2052-11-15")
+
+obl <- data.frame(udløb, kupon, pris)
+
+colnames(obl) <- c("Udløbsdato", "Kuponrente", "Pris")
+
+rownames(obl) <- c("Foroya Lan JUN20", "Danske stat 2020", "Foroya Lan JUN21", "3St.l. 21 DG",
+                   "Danske stat 2022", "Foroya Lan JUN23", "DGBI 2023 GB",
+                   "7St.l. 24 GB", "Danske stat 2025", "Danske stat 2027", "Danske stat 2029",
+                   "DGBi", "4.5St.l 39 GB", "Danske stat 2052")
+
+obl
+```
+
+Vi antager at betalingsdagen (kupondagen) er på samme dag og måned som udløbsdatoen.\
+Vi bestemmer hver terminsdato i obligationens løbetid
+
+```{r}
+termin1 <- c("2020-06-11")
+termin2 <- c("2020-11-15")
+termin3 <- c("2020-06-22", "2021-06-22")
+termin4 <- c("2020-11-15", "2021-11-15")
+
+termin5 <- c("2020-11-15", "2021-11-15", "2022-11-15")
+
+termin6 <- c("2020-06-27", "2021-06-27", "2022-06-27", "2023-06-27")
+
+termin7 <- c("2020-11-15","2021-11-15", "2022-11-15", "2023-11-15")
+
+termin8 <- c("2020-11-10", "2021-11-10", "2022-11-10", "2023-11-10", "2024-11-10")
+
+termin9 <- c("2020-11-15", "2021-11-15", "2022-11-15", "2023-11-15",
+             "2024-11-15","2025-11-15")
+
+termin10 <- c("2020-11-15", "2021-11-15", "2022-11-15", "2023-11-15", "2024-11-15",
+              "2025-11-15","2026-11-15", "2027-11-15")
+
+termin11 <- c("2020-11-15", "2021-11-15", "2022-11-15", "2023-11-15", "2024-11-15",
+              "2025-11-15","2026-11-15", "2027-11-15", "2028-11-15", "2029-11-15")
+
+termin12 <- c("2020-11-15", "2021-11-15", "2022-11-15", "2023-11-15", "2024-11-15",
+              "2025-11-15","2026-11-15", "2027-11-15", "2028-11-15", "2029-11-15",
+              "2030-11-15")
+
+termin13 <- c("2020-11-15", "2021-11-15", "2022-11-15", "2023-11-15", "2024-11-15",
+              "2025-11-15","2026-11-15", "2027-11-15", "2028-11-15", "2029-11-15",
+              "2030-11-15", "2031-11-15","2032-11-15", "2033-11-15", "2034-11-15",
+              "2035-11-15", "2036-11-15", "2037-11-15","2038-11-15", "2039-11-15")
+
+termin14 <- c("2020-11-15", "2021-11-15", "2022-11-15", "2023-11-15", "2024-11-15",
+              "2025-11-15","2026-11-15", "2027-11-15", "2028-11-15", "2029-11-15",
+              "2030-11-15", "2031-11-15","2032-11-15", "2033-11-15", "2034-11-15",
+              "2035-11-15", "2036-11-15","2037-11-15","2038-11-15", "2039-11-15",
+              "2040-11-15", "2041-11-15", "2042-11-15", "2043-11-15", "2044-11-15",
+              "2045-11-15", "2046-11-15", "2047-11-15", "2048-11-15", "2049-11-15",
+              "2050-11-15","2051-11-15", "2052-11-15")
+```
+
+Vi bestemmer den tidsmæssige afstand (målt i år) fra d. 3. april 2020 til hver kupondag for obligationerne $(t_1, t_2, \dots, t_N)$, hvor $t_N=T_N$ er den tidsmæssig afstand fra nu til udløbsdatoen (den sidste kupon dag)
+
+```{r}
+idag <- c("2020-04-03")
+
+tid1 <- c(1:length(termin1))
+for(i in 1:length(termin1)){
+  tid1[i] <- time_length(difftime(as.Date(termin1[i]),as.Date(idag)), "years")
+}
+
+
+tid2 <- c(1:length(termin2))
+for(i in 1:length(termin2)){
+  tid2[i] <- time_length(difftime(as.Date(termin2[i]),as.Date(idag)), "years")
+}
+
+tid3 <- c(1:length(termin3))
+for(i in 1:length(termin3)){
+  tid3[i] <- time_length(difftime(as.Date(termin3[i]),as.Date(idag)), "years")
+}
+
+
+tid4 <- c(1:length(termin4))
+for(i in 1:length(termin4)){
+  tid4[i] <- time_length(difftime(as.Date(termin4[i]),as.Date(idag)), "years")
+}
+
+tid5 <- c(1:length(termin5))
+for(i in 1:length(termin5)){
+  tid5[i] <- time_length(difftime(as.Date(termin5[i]),as.Date(idag)), "years")
+}
+
+tid6 <- c(1:length(termin6))
+for(i in 1:length(termin6)){
+  tid6[i] <- time_length(difftime(as.Date(termin6[i]),as.Date(idag)), "years")
+}
+
+tid7 <- c(1:length(termin7))
+for(i in 1:length(termin7)){
+  tid7[i] <- time_length(difftime(as.Date(termin7[i]),as.Date(idag)), "years")
+}
+
+tid8 <- c(1:length(termin8))
+for(i in 1:length(termin8)){
+  tid8[i] <- time_length(difftime(as.Date(termin8[i]),as.Date(idag)), "years")
+}
+
+tid9 <- c(1:length(termin9))
+for(i in 1:length(termin9)){
+  tid9[i] <- time_length(difftime(as.Date(termin9[i]),as.Date(idag)), "years")
+}
+
+tid10 <- c(1:length(termin10))
+for(i in 1:length(termin10)){
+  tid10[i] <- time_length(difftime(as.Date(termin10[i]),as.Date(idag)), "years")
+}
+
+tid11 <- c(1:length(termin11))
+for(i in 1:length(termin11)){
+  tid11[i] <- time_length(difftime(as.Date(termin11[i]),as.Date(idag)), "years")
+}
+
+tid12 <- c(1:length(termin12))
+for(i in 1:length(termin12)){
+  tid12[i] <- time_length(difftime(as.Date(termin12[i]),as.Date(idag)), "years")
+}
+
+tid13 <- c(1:length(termin13))
+for(i in 1:length(termin13)){
+  tid13[i] <- time_length(difftime(as.Date(termin13[i]),as.Date(idag)), "years")
+}
+
+tid14 <- c(1:length(termin14))
+for(i in 1:length(termin14)){
+  tid14[i] <- time_length(difftime(as.Date(termin14[i]),as.Date(idag)), "years")
+}
+```
+
+Vi bestemmer nu ydelsesrækken for hver obligation. Vi antager at hovedstolen er 100 for alle obligationer. Siden at alle obligationer er stående, har vi følgende udregninger.
+
+```{r}
+ydelse1 <- c(1:length(tid1))
+for(i in 1:(length(ydelse1)-1)){
+  ydelse1[i] <- 100*obl[1,2]
+  ydelse1[length(ydelse1)] <- 100*(1+obl[1,2])
+}
+
+
+ydelse2 <- c(1:length(tid2))
+for(i in 1:(length(ydelse2)-1)){
+  ydelse2[i] <- 100*obl[2,2]
+  ydelse2[length(ydelse2)] <- 100*(1+obl[2,2])
+}
+
+
+ydelse3 <- c(1:length(tid3))
+for(i in 1:(length(ydelse3)-1)){
+  ydelse3[i] <- 100*obl[3,2]
+  ydelse3[length(ydelse3)] <- 100*(1+obl[3,2])
+}
+
+
+ydelse4 <- c(1:length(tid4))
+for(i in 1:(length(ydelse4)-1)){
+  ydelse4[i] <- 100*obl[4,2]
+  ydelse4[length(ydelse4)] <- 100*(1+obl[4,2])
+}
+
+
+ydelse5 <- c(1:length(tid5))
+for(i in 1:(length(ydelse5)-1)){
+  ydelse5[i] <- 100*obl[5,2]
+  ydelse5[length(ydelse5)] <- 100*(1+obl[5,2])
+}
+
+
+ydelse6 <- c(1:length(tid6))
+for(i in 1:(length(ydelse6)-1)){
+  ydelse6[i] <- 100*obl[6,2]
+  ydelse6[length(ydelse6)] <- 100*(1+obl[6,2])
+}
+
+
+ydelse7 <- c(1:length(tid7))
+for(i in 1:(length(ydelse7)-1)){
+  ydelse7[i] <- 100*obl[7,2]
+  ydelse7[length(ydelse7)] <- 100*(1+obl[7,2])
+}
+
+
+ydelse8 <- c(1:length(tid8))
+for(i in 1:(length(ydelse8)-1)){
+  ydelse8[i] <- 100*obl[8,2]
+  ydelse8[length(ydelse8)] <- 100*(1+obl[8,2])
+} 
+
+ydelse9 <- c(1:length(tid9))
+for(i in 1:(length(ydelse9)-1)){
+  ydelse9[i] <- 100*obl[9,2]
+  ydelse9[length(ydelse9)] <- 100*(1+obl[9,2])
+}
+
+
+ydelse10 <- c(1:length(tid10))
+for(i in 1:(length(ydelse10)-1)){
+  ydelse10[i] <- 100*obl[10,2]
+  ydelse10[length(ydelse10)] <- 100*(1+obl[10,2])
+}
+
+
+ydelse11 <- c(1:length(tid11))
+for(i in 1:(length(ydelse11)-1)){
+  ydelse11[i] <- 100*obl[11,2]
+  ydelse11[length(ydelse11)] <- 100*(1+obl[11,2])
+}
+
+
+ydelse12 <- c(1:length(tid12))
+for(i in 1:(length(ydelse12)-1)){
+  ydelse12[i] <- 100*obl[12,2]
+  ydelse12[length(ydelse12)] <- 100*(1+obl[12,2])
+}
+
+
+ydelse13 <- c(1:length(tid13))
+for(i in 1:(length(ydelse13)-1)){
+  ydelse13[i] <- 100*obl[13,2]
+  ydelse13[length(ydelse13)] <- 100*(1+obl[13,2])
+}
+
+
+ydelse14 <- c(1:length(tid14))
+for(i in 1:(length(ydelse14)-1)){
+  ydelse14[i] <- 100*obl[14,2]
+  ydelse14[length(ydelse14)] <- 100*(1+obl[14,2])
+}
+
+```
+
+Bestemmer den vedhængende rente
+
+```{r}
+ved.rente <- c(1:length(obl[,1]))
+
+ved.rente[1] <- 100*obl[1,2]*(1-tid1[1])
+ved.rente[2] <- 100*obl[2,2]*(1-tid2[1])
+ved.rente[3] <- 100*obl[3,2]*(1-tid3[1])
+ved.rente[4] <- 100*obl[4,2]*(1-tid4[1])
+ved.rente[5] <- 100*obl[5,2]*(1-tid5[1])
+ved.rente[6] <- 100*obl[6,2]*(1-tid6[1])
+ved.rente[7] <- 100*obl[7,2]*(1-tid7[1])
+ved.rente[8] <- 100*obl[8,2]*(1-tid8[1])
+ved.rente[9] <- 100*obl[9,2]*(1-tid9[1])
+ved.rente[10] <- 100*obl[10,2]*(1-tid10[1])
+ved.rente[11] <- 100*obl[11,2]*(1-tid11[1])
+ved.rente[12] <- 100*obl[12,2]*(1-tid12[1])
+ved.rente[13] <- 100*obl[13,2]*(1-tid13[1])
+ved.rente[14] <- 100*obl[14,2]*(1-tid14[1])
+
+ved.rente
+```
+
+Bestemmer højre siden i nelson-siegel paramteriseringen (metode 2)
+
+```{r}
+z <- c(1:length(pris))
+
+for(i in 1:length(z)){
+  z[i] <- pris[i]+ved.rente[i] 
+}
+
+z
+
+```
+
+For forskellige $\theta\in[1,2]$ finder jeg de parameter $a,b,c$ der giver mindst ...
+
+Vi har beregnet ydelserne til hver kupondag tidligere. Så vi sætter dem op i en matrix.
+```{r}
+ydelse <- matrix(0:0, nrow = length(obl[,1]), ncol = length(ydelse14))
+for(i in 1:length(ydelse1)){
+  ydelse[1,i] <- ydelse1[i]
+}
+for(i in 1:length(ydelse2)){
+  ydelse[2,i] <- ydelse2[i]
+}
+for(i in 1:length(ydelse3)){
+  ydelse[3,i] <- ydelse3[i]
+}
+for(i in 1:length(ydelse4)){
+  ydelse[4,i] <- ydelse4[i]
+}
+for(i in 1:length(ydelse5)){
+  ydelse[5,i] <- ydelse5[i]
+}
+for(i in 1:length(ydelse6)){
+  ydelse[6,i] <- ydelse6[i]
+}
+for(i in 1:length(ydelse7)){
+  ydelse[7,i] <- ydelse7[i]
+}
+for(i in 1:length(ydelse8)){
+  ydelse[8,i] <- ydelse8[i]
+}
+for(i in 1:length(ydelse9)){
+  ydelse[9,i] <- ydelse9[i]
+}
+for(i in 1:length(ydelse10)){
+  ydelse[10,i] <- ydelse10[i]
+}
+for(i in 1:length(ydelse11)){
+  ydelse[11,i] <- ydelse11[i]
+}
+for(i in 1:length(ydelse12)){
+  ydelse[12,i] <- ydelse12[i]
+}
+for(i in 1:length(ydelse13)){
+  ydelse[13,i] <- ydelse13[i]
+}
+for(i in 1:length(ydelse14)){
+  ydelse[14,i] <- ydelse14[i]
+}
+
+ydelse
+```
+Vi laver en matrix som indholder den tidsmæssige afstand fra nu til hver kupondag for hver obligation
+```{r}
+tid <- matrix(0:0, nrow = length(obl[,1]), ncol = length(ydelse14))
+for(i in 1:length(tid1)){
+  tid[1,i] <- tid1[i]
+}
+for(i in 1:length(tid2)){
+  tid[2,i] <- tid2[i]
+}
+for(i in 1:length(tid3)){
+  tid[3,i] <- tid3[i]
+}
+for(i in 1:length(tid4)){
+  tid[4,i] <- tid4[i]
+}
+for(i in 1:length(tid5)){
+  tid[5,i] <- tid5[i]
+}
+for(i in 1:length(tid6)){
+  tid[6,i] <- tid6[i]
+}
+for(i in 1:length(tid7)){
+  tid[7,i] <- tid7[i]
+}
+for(i in 1:length(tid8)){
+  tid[8,i] <- tid8[i]
+}
+for(i in 1:length(tid9)){
+  tid[9,i] <- tid9[i]
+}
+for(i in 1:length(tid10)){
+  tid[10,i] <- tid10[i]
+}
+for(i in 1:length(tid11)){
+  tid[11,i] <- tid11[i]
+}
+for(i in 1:length(tid12)){
+  tid[12,i] <- tid12[i]
+}
+for(i in 1:length(tid13)){
+  tid[13,i] <- tid13[i]
+}
+for(i in 1:length(tid14)){
+  tid[14,i] <- tid14[i]
+}
+
+tid
+
+```
+
+Vi samler ydelserne, tiderne og z (højre siden) i en tabel, som vi skal lave lineær regression over
+
+```{r}
+library(nlme)
+dataset <- data.frame(z, ydelse, tid)
+
+model_theta1 <- z~
+  X1*exp(-beta0*X1.1-beta1*1.01*(1-exp(-X1.1/1))-beta2*X1.1*exp(-X1.1/1))+
+  X2*exp(-beta0*X2.1-beta1*1*(1-exp(-X2.1/1))-beta2*X2.1*exp(-X2.1/1))+
+  X3*exp(-beta0*X3.1-beta1*1*(1-exp(-X3.1/1))-beta2*X3.1*exp(-X3.1/1))+
+  X4*exp(-beta0*X4.1-beta1*1*(1-exp(-X4.1/1))-beta2*X4.1*exp(-X4.1/1))+
+  X5*exp(-beta0*X5.1-beta1*1*(1-exp(-X5.1/1))-beta2*X5.1*exp(-X5.1/1))+
+  X6*exp(-beta0*X6.1-beta1*1*(1-exp(-X6.1/1))-beta2*X6.1*exp(-X6.1/1))+
+  X7*exp(-beta0*X7.1-beta1*1*(1-exp(-X7.1/1))-beta2*X7.1*exp(-X7.1/1))+
+  X8*exp(-beta0*X8.1-beta1*1*(1-exp(-X8.1/1))-beta2*X8.1*exp(-X1.1/1))+
+  X9*exp(-beta0*X9.1-beta1*1*(1-exp(-X9.1/1))-beta2*X9.1*exp(-X9.1/1))+
+  X10*exp(-beta0*X10.1-beta1*1*(1-exp(-X10.1/1))-beta2*X10.1*exp(-X10.1/1))+
+  X11*exp(-beta0*X11.1-beta1*1*(1-exp(-X11.1/1))-beta2*X11.1*exp(-X11.1/1))+
+  X12*exp(-beta0*X12.1-beta1*1*(1-exp(-X12.1/1))-beta2*X12.1*exp(-X12.1/1))+
+  X13*exp(-beta0*X13.1-beta1*1*(1-exp(-X13.1/1))-beta2*X13.1*exp(-X13.1/1))+
+  X14*exp(-beta0*X14.1-beta1*1*(1-exp(-X14.1/1))-beta2*X14.1*exp(-X14.1/1))+
+  X15*exp(-beta0*X15.1-beta1*1*(1-exp(-X15.1/1))-beta2*X15.1*exp(-X15.1/1))+
+  X16*exp(-beta0*X16.1-beta1*1*(1-exp(-X16.1/1))-beta2*X16.1*exp(-X16.1/1))+
+  X17*exp(-beta0*X17.1-beta1*1*(1-exp(-X17.1/1))-beta2*X17.1*exp(-X17.1/1))+
+  X18*exp(-beta0*X18.1-beta1*1*(1-exp(-X18.1/1))-beta2*X18.1*exp(-X18.1/1))+
+  X19*exp(-beta0*X19.1-beta1*1*(1-exp(-X19.1/1))-beta2*X19.1*exp(-X19.1/1))+
+  X20*exp(-beta0*X20.1-beta1*1*(1-exp(-X20.1/1))-beta2*X20.1*exp(-X20.1/1))+
+  X21*exp(-beta0*X21.1-beta1*1*(1-exp(-X21.1/1))-beta2*X21.1*exp(-X21.1/1))+
+  X22*exp(-beta0*X22.1-beta1*1*(1-exp(-X22.1/1))-beta2*X22.1*exp(-X22.1/1))+
+  X23*exp(-beta0*X23.1-beta1*1*(1-exp(-X23.1/1))-beta2*X23.1*exp(-X23.1/1))+
+  X24*exp(-beta0*X24.1-beta1*1*(1-exp(-X24.1/1))-beta2*X24.1*exp(-X24.1/1))+
+  X25*exp(-beta0*X25.1-beta1*1*(1-exp(-X25.1/1))-beta2*X25.1*exp(-X25.1/1))+
+  X26*exp(-beta0*X26.1-beta1*1*(1-exp(-X26.1/1))-beta2*X26.1*exp(-X26.1/1))+
+  X27*exp(-beta0*X27.1-beta1*1*(1-exp(-X27.1/1))-beta2*X27.1*exp(-X27.1/1))+
+  X28*exp(-beta0*X28.1-beta1*1*(1-exp(-X28.1/1))-beta2*X28.1*exp(-X28.1/1))+
+  X29*exp(-beta0*X29.1-beta1*1*(1-exp(-X29.1/1))-beta2*X29.1*exp(-X29.1/1))+
+  X30*exp(-beta0*X30.1-beta1*1*(1-exp(-X30.1/1))-beta2*X30.1*exp(-X30.1/1))+
+  X31*exp(-beta0*X31.1-beta1*1*(1-exp(-X31.1/1))-beta2*X31.1*exp(-X31.1/1))+
+  X32*exp(-beta0*X32.1-beta1*1*(1-exp(-X32.1/1))-beta2*X32.1*exp(-X32.1/1))+
+  X33*exp(-beta0*X33.1-beta1*1*(1-exp(-X33.1/1))-beta2*X33.1*exp(-X33.1/1))
+
+estimation1 <- gnls(model_theta1, start = c(beta0=1, beta1=1, beta2=1), data = dataset, control=list(tolerance=100000000))
+```
+\newpage
+```{r}
+summary(estimation1)
+```
+
+
+Definere nulkuponrente kurven vha. Nelson-Siegel metode 2
+
+```{r}
+parameter1 <- c(0.00208782, -0.06252897, 0.00675234, 1)
+
+nulkupon1 <- function(t){
+  parameter1[1]+parameter1[2]*((1-exp(-t/parameter1[4]))/(t/parameter1[4]))+parameter1[3]*exp(-t/parameter1[1])
+}
+
+{curve(nulkupon1, xlim = c(0.54, 32.5), ylim=c(-0.04, 0.019), col="blue", lwd=1.5, xlab="Tid til udløbsdato (år)", ylab="Nulkuponrente", main = "Nulkuponrentekurve, 3. april 2020") 
+legend(10, -0.02, legend = c("Nielson-Siegel metode 2, Theta=1"), col = c("blue"), lty=c(1), cex=0.8, box.lty=1, box.lwd=1, box.col="black")}
+```
+
