@@ -24,7 +24,7 @@ For 23. maj 2019 datasættet
 “McCulloch 23. maj 2019.Rmd”   er .Rmd filen for McCulloch Spline metoden på datasættet 23. maj 2019.
 
 
-“Boostrapping 23. maj 2019.Rmd” er .Rmd filen for Bootstrapping metoden på datasættet 23. maj 2019
+“Bootstrapping 23. maj 2019.Rmd” er .Rmd filen for Bootstrapping metoden på datasættet 23. maj 2019
 
 
 “Nelson Siegel metode1 23. maj 2019.Rmd” er .Rmd filen for Nelson Siegels metode 1 på datasættet 23. maj 2019
