@@ -1,6 +1,7 @@
 ﻿README
 Denne README fil tilhører Gruppe 4.215 på 4. semester Af Matematik-Økonomi på 4. semester.
 Sidst redigeret 28/05-2020
+Udarbejdet af Jacob Høgh Tranum Laursen, Nick Kruse og Jacob Qazizada
 ========================================================================
 
 
@@ -29,7 +30,7 @@ For 23. maj 2019 datasættet
 “Nelson Siegel metode1 23. maj 2019.Rmd” er .Rmd filen for Nelson Siegels metode 1 på datasættet 23. maj 2019
 
 
-.“Nelson Siegel metode2 23. maj 2019.Rmd” er .Rmd filen for Nelson Siegels metode 2 på datasættet 23. maj 2019
+“Nelson Siegel metode2 23. maj 2019.Rmd” er .Rmd filen for Nelson Siegels metode 2 på datasættet 23. maj 2019
 
 
 
@@ -50,7 +51,7 @@ For 3. april 2020 datasættet
 
 ========================================================================
 .py filer og Python.
-Det forventes at læseren selv kan inkorporere Python filerne i deres egen Python compiler
+Det forventes at læseren selv kan inkoorporere Python filerne i deres egen Python compiler
 
 
 Tanggaards tre forslag til estimering af rentestrukturen:
